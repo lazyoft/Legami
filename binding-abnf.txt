@@ -1,0 +1,34 @@
+letter = ALPHA
+digit = DIGIT
+ws = WSP
+open-paren = "(";
+close-paren = ")";
+underscore = "_";
+dot = "."
+quote = "/"
+comma = ","
+hash = "#"
+open-angular = "{"
+close-angular = "}"
+escape = "\"
+
+left-bind = ":="
+right-bind = "=:"
+left-assignment = ":-"
+right-assignment = "-:"
+full-bind = "=="
+
+identifier = letter / underscore *[letter / underscore / digit]
+path = identifier *[dot identifier]
+conversion = identifier open-paren *ws path *ws [comma *ws [string-literal / constant-literal ] *ws close-paren
+
+string-literal = quote *char-in-string quote
+char-in-string = any-char / escape (escape / 'b' / 'f' / 'n' / 'r' / 't' / quote)
+any-char = %x20-D7FF / %xE000-FFFD / %x10000-10FFFF
+
+constant-literal = hash identifier
+expression = constant-literal / conversion / path
+binding-expression = *ws identifier *ws (left-bind / right-bind / left-assignment / right-assignment / full-bind) *ws expression
+binding-list-item = *ws *(open-angular *ws binding-expression *ws close-angular)
+binding-list = *(binding-list-item)
+binding = binding-expression / binding-list
