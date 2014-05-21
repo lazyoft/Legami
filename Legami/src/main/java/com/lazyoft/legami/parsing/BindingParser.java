@@ -1,8 +1,5 @@
 package com.lazyoft.legami.parsing;
 
-import com.lazyoft.legami.parsing.tokens.Binding;
-import com.lazyoft.legami.parsing.tokens.Token;
-
 public class BindingParser {
     public static Token parse(String source) {
         return Binding.produce(new Scanner(source));

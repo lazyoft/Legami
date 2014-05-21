@@ -1,6 +1,4 @@
-package com.lazyoft.legami.parsing.tokens;
-
-import com.lazyoft.legami.parsing.Scanner;
+package com.lazyoft.legami.parsing;
 
 public class ConstantLiteral extends Token {
     private ConstantLiteral(Object ...tokens) {

@@ -1,6 +1,6 @@
-package com.lazyoft.legami.parsing.tokens;
+package com.lazyoft.legami.parsing;
 
-public final class Terminals {
+final class Terminals {
     public final static Token CloseParen = new TerminalToken(")");
     public final static Token CloseAngular = new TerminalToken("}");
     public final static Token Colon = new TerminalToken(":");

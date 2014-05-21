@@ -1,8 +1,5 @@
 package com.lazyoft.legami.parsing;
 
-import com.lazyoft.legami.parsing.tokens.Terminals;
-import com.lazyoft.legami.parsing.tokens.Token;
-
 import java.util.Stack;
 
 class Scanner {

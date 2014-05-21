@@ -1,4 +1,4 @@
-package com.lazyoft.legami.parsing.tokens;
+package com.lazyoft.legami.parsing;
 
 import java.util.ArrayList;
 import java.util.List;
