@@ -5,19 +5,19 @@ public class ConstantLiteralToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
-        scanner.start();
+    public static Token parse(TokenSource source) {
+        source.startScan();
 
         // constant-literal = hash identifier
-        if(scanner.next() == Terminals.Hash) {
-            Token identifier = IdentifierToken.produce(scanner);
-            if (identifier == null)
-                return scanner.error("Expected identifier in constant literal");
+        if(source.next() == Terminals.Hash) {
+            Token identifier = IdentifierToken.parse(source);
+            if (identifier == Token.NotFound)
+                return source.error("Expected identifier in constant literal");
 
-            scanner.commit();
+            source.endScan();
             return new ConstantLiteralToken(identifier);
         }
 
-        return scanner.error("Expected constant literal prefix");
+        return source.error("Expected constant literal prefix");
     }
 }

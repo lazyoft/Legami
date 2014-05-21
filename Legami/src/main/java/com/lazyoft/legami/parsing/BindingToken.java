@@ -5,21 +5,21 @@ public class BindingToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         // binding = (binding-expression / binding-list) *ws
-        scanner.start();
-        Token binding = BindingExpressionToken.produce(scanner);
-        if(binding == Token.Empty) {
-            binding = BindingListToken.produce(scanner);
-            if(binding == Token.Empty)
-                return scanner.error("Expected binding expression or binding list in binding");
+        source.startScan();
+        Token binding = BindingExpressionToken.parse(source);
+        if(binding == Token.NotFound) {
+            binding = BindingListToken.parse(source);
+            if(binding == Token.NotFound)
+                return source.error("Expected binding expression or binding list in binding");
         }
 
-        scanner.consumeWhitespace();
-        if(!scanner.atEnd())
-            return scanner.error("Expected end of binding");
+        source.consumeWhitespace();
+        if(!source.atEnd())
+            return source.error("Expected end of binding");
 
-        scanner.commit();
+        source.endScan();
         return new BindingToken(binding);
     }
 }

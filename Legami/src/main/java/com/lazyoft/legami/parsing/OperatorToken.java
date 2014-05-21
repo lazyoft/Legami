@@ -1,28 +1,28 @@
 package com.lazyoft.legami.parsing;
 
 public class OperatorToken {
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         // operator = left-bind / right-bind / left-assignment / right-assignment / full-bind
-        scanner.start();
-        Token operator = Token.Empty;
-        if(scanner.peek() == Terminals.Colon && scanner.peek(1) == Terminals.Equal)
+        source.startScan();
+        Token operator = Token.NotFound;
+        if(source.peek() == Terminals.Colon && source.peek(1) == Terminals.Equal)
             operator = Terminals.LeftBind;
 
-        if(operator == Token.Empty && scanner.peek() == Terminals.Equal && scanner.peek(1) == Terminals.Colon)
+        if(operator == Token.NotFound && source.peek() == Terminals.Equal && source.peek(1) == Terminals.Colon)
             operator = Terminals.RightBind;
 
-        if(operator == Token.Empty && scanner.peek() == Terminals.Colon && scanner.peek(1) == Terminals.Hyphen)
+        if(operator == Token.NotFound && source.peek() == Terminals.Colon && source.peek(1) == Terminals.Hyphen)
             operator = Terminals.LeftAssignment;
 
-        if(operator == Token.Empty && scanner.peek() == Terminals.Hyphen && scanner.peek(1) == Terminals.Colon)
+        if(operator == Token.NotFound && source.peek() == Terminals.Hyphen && source.peek(1) == Terminals.Colon)
             operator = Terminals.RightAssignment;
 
-        if(operator == Token.Empty && scanner.peek() == Terminals.Equal && scanner.peek(1) == Terminals.Equal)
+        if(operator == Token.NotFound && source.peek() == Terminals.Equal && source.peek(1) == Terminals.Equal)
             operator = Terminals.FullBind;
 
-        scanner.advance();
-        scanner.advance();
-        scanner.commit();
+        source.advance();
+        source.advance();
+        source.endScan();
         return operator;
     }
 }

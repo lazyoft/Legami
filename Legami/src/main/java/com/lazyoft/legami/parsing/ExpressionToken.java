@@ -5,21 +5,21 @@ public class ExpressionToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         // expression = constant-literal / conversion / path
-        scanner.start();
+        source.startScan();
 
-        Token expression = ConversionToken.produce(scanner);
-        if(expression == Token.Empty) {
-            expression = ConstantLiteralToken.produce(scanner);
-            if(expression == Token.Empty) {
-                expression = PathToken.produce(scanner);
+        Token expression = ConversionToken.parse(source);
+        if(expression == Token.NotFound) {
+            expression = ConstantLiteralToken.parse(source);
+            if(expression == Token.NotFound) {
+                expression = PathToken.parse(source);
             }
         }
-        if(expression == null)
-            return scanner.error("Expected constant expression, conversion expression or path");
+        if(expression == Token.NotFound)
+            return source.error("Expected constant expression, conversion expression or path");
 
-        scanner.commit();
+        source.endScan();
         return new ExpressionToken(expression);
     }
 }

@@ -5,24 +5,24 @@ public class BindingListItemToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         // binding-list-item = *ws *(open-angular *ws binding-expression *ws close-angular)
-        scanner.start();
-        scanner.consumeWhitespace();
+        source.startScan();
+        source.consumeWhitespace();
 
-        if(!(scanner.next() == Terminals.OpenAngular))
-            return scanner.error("Expected open angular in binding list item");
+        if(source.next() != Terminals.OpenAngular)
+            return source.error("Expected open angular in binding list item");
 
-        scanner.consumeWhitespace();
-        Token expression = BindingExpressionToken.produce(scanner);
-        if(expression == Token.Empty)
-            return scanner.error("Expected binding expression in binding list item");
+        source.consumeWhitespace();
+        Token expression = BindingExpressionToken.parse(source);
+        if(expression == Token.NotFound)
+            return source.error("Expected binding expression in binding list item");
 
-        scanner.consumeWhitespace();
-        if(!(scanner.next() == Terminals.CloseAngular))
-            return scanner.error("Expected close angular in binding list item");
+        source.consumeWhitespace();
+        if(source.next() != Terminals.CloseAngular)
+            return source.error("Expected close angular in binding list item");
 
-        scanner.commit();
+        source.endScan();
         return new BindingListItemToken(expression);
     }
 }

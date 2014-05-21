@@ -23,7 +23,7 @@ final class Terminals {
 
     public final static class Letter extends TerminalToken { public Letter(char c) { super(String.valueOf(c)); } }
     public final static class Digit extends TerminalToken { public Digit(char c) { super(String.valueOf(c)); } }
-    public final static Token Unknown(final char c) { return new TerminalToken(String.valueOf(c)); }
+    public static Token Unknown(final char c) { return new TerminalToken(String.valueOf(c)); }
 }
 
 

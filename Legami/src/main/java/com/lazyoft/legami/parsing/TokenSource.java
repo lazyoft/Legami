@@ -2,44 +2,40 @@ package com.lazyoft.legami.parsing;
 
 import java.util.Stack;
 
-class Scanner {
-    private String source;
-    private int offset;
+class TokenSource {
+    private String sourceText;
+    private int position;
     private Stack<Integer> offsetStack;
-    private String error;
+    private String errorMessage;
 
-    public Scanner(String source) {
-        this.source = source;
+    public TokenSource(String sourceText) {
+        this.sourceText = sourceText;
         offsetStack = new Stack<Integer>();
-        error = "";
-        offset = 0;
+        errorMessage = "";
+        position = 0;
     }
 
-    public void start() {
-        offsetStack.push(offset);
+    public void startScan() {
+        offsetStack.push(position);
     }
 
-    public void reset() {
-        if(offsetStack.size() > 0)
-            offset = offsetStack.pop();
-        else
-            offset = 0;
-    }
-
-    public void commit() {
+    public void endScan() {
         if(offsetStack.size() > 0)
             offsetStack.pop();
-        error = "";
+        errorMessage = "";
     }
 
     public Token error(String message) {
-        error = "@" + offset + ": " + message;
-        reset();
-        return Token.Empty;
+        errorMessage = "@" + position + ": " + message;
+        if(offsetStack.size() > 0)
+            position = offsetStack.pop();
+        else
+            position = 0;
+        return Token.NotFound;
     }
 
     public void advance() {
-        offset++;
+        position++;
     }
 
     public void consumeWhitespace() {
@@ -48,16 +44,16 @@ class Scanner {
     }
 
     public boolean atEnd() {
-        return offset >= source.length();
+        return position >= sourceText.length();
     }
 
-    public String getError() {
-        return error;
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
     public Token next() {
         Token result = peek();
-        if(result != Token.Empty)
+        if(result != Token.NotFound)
             advance();
         return result;
     }
@@ -67,12 +63,11 @@ class Scanner {
     }
 
     public Token peek(int delta) {
-        int position = offset + delta;
-        if (position >= source.length() || position < 0)
-            return Token.Empty;
+        int position = this.position + delta;
+        if (position >= sourceText.length() || position < 0)
+            return Token.NotFound;
 
-        char c = source.charAt(position);
-        return charToToken(c);
+        return charToToken(sourceText.charAt(position));
     }
 
     private Token charToToken(char c) {

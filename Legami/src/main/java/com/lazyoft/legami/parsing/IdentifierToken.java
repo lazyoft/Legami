@@ -8,25 +8,25 @@ public class IdentifierToken extends Token {
         super(tokens);
     }
 
-    static Token produce(Scanner scanner) {
+    static Token parse(TokenSource source) {
         List<Token> result = new ArrayList<Token>();
-        scanner.start();
+        source.startScan();
 
         // identifier = letter / underscore *[letter / underscore / digit]
-        Token current = scanner.peek();
+        Token current = source.peek();
         if(current instanceof Terminals.Letter || current == Terminals.Underscore) {
             do {
-                scanner.advance();
+                source.advance();
                 result.add(current);
-                current = scanner.peek();
+                current = source.peek();
             }
-            while (current != Token.Empty && (current instanceof Terminals.Letter || current == Terminals.Underscore || current instanceof Terminals.Digit));
+            while (current != Token.NotFound && (current instanceof Terminals.Letter || current == Terminals.Underscore || current instanceof Terminals.Digit));
         }
 
         if(result.isEmpty())
-            return scanner.error("Expected identifier");
+            return source.error("Expected identifier");
 
-        scanner.commit();
+        source.endScan();
         return new IdentifierToken(result);
     }
 }

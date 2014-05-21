@@ -8,25 +8,25 @@ public class PathToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         List<Token> result = new ArrayList<Token>();
-        scanner.start();
+        source.startScan();
 
         // path = identifier *[dotted-identifier]
-        Token identifier = IdentifierToken.produce(scanner);
-        while(identifier != Token.Empty) {
+        Token identifier = IdentifierToken.parse(source);
+        while(identifier != Token.NotFound) {
             result.add(identifier);
-            if(scanner.peek() == Terminals.Dot)
-                scanner.advance();
+            if(source.peek() == Terminals.Dot)
+                source.advance();
              else
                 break;
-            identifier = IdentifierToken.produce(scanner);
+            identifier = IdentifierToken.parse(source);
         }
 
         if(result.isEmpty())
-            return scanner.error("Expected path");
+            return source.error("Expected path");
 
-        scanner.commit();
+        source.endScan();
         return new PathToken(result);
     }
 }

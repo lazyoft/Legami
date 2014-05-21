@@ -8,22 +8,22 @@ public class BindingListToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         List<Token> result = new ArrayList<Token>();
         Token item;
 
         // binding-list = *(binding-list-item)
-        scanner.start();
+        source.startScan();
         do {
-            item = BindingListItemToken.produce(scanner);
-            if(item != Token.Empty)
+            item = BindingListItemToken.parse(source);
+            if(item != Token.NotFound)
                 result.add(item);
-        } while(item != Token.Empty);
+        } while(item != Token.NotFound);
 
         if(result.isEmpty())
-            return scanner.error("Expected Binding List");
+            return source.error("Expected Binding List");
 
-        scanner.commit();
+        source.endScan();
         return new BindingListToken(result);
     }
 }

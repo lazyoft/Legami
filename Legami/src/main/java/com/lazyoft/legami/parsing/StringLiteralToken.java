@@ -8,25 +8,25 @@ public class StringLiteralToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         List<Token> result = new ArrayList<Token>();
-        scanner.start();
+        source.startScan();
 
         // string-literal = quote *char-in-string quote
-        Token current = scanner.next();
+        Token current = source.next();
         if(current == Terminals.Quote) {
             do {
-                result.add(scanner.next());
-                current = scanner.peek();
+                result.add(source.next());
+                current = source.peek();
             }
-            while (current != Token.Empty && (current != Terminals.Quote) || (current == Terminals.Quote && scanner.peek(-1) == Terminals.Escape));
+            while (current != Token.NotFound && (current != Terminals.Quote) || (current == Terminals.Quote && source.peek(-1) == Terminals.Escape));
         }
 
         if(result.isEmpty())
-            return scanner.error("Expected string literal");
+            return source.error("Expected string literal");
 
-        scanner.advance();
-        scanner.commit();
+        source.advance();
+        source.endScan();
         return new StringLiteralToken(result);
     }
 }

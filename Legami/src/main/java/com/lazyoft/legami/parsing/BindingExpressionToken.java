@@ -5,26 +5,26 @@ public class BindingExpressionToken extends Token {
         super(tokens);
     }
 
-    public static Token produce(Scanner scanner) {
+    public static Token parse(TokenSource source) {
         // binding-expression = *ws identifier *ws operator *ws expression
-        scanner.start();
+        source.startScan();
 
-        scanner.consumeWhitespace();
-        Token identifier = IdentifierToken.produce(scanner);
-        if(identifier == Token.Empty)
-            return scanner.error("Expected identifier in binding expression");
+        source.consumeWhitespace();
+        Token identifier = IdentifierToken.parse(source);
+        if(identifier == Token.NotFound)
+            return source.error("Expected identifier in binding expression");
 
-        scanner.consumeWhitespace();
-        Token operator = OperatorToken.produce(scanner);
-        if(operator == Token.Empty)
-            return scanner.error("Expected operator in binding expression");
+        source.consumeWhitespace();
+        Token operator = OperatorToken.parse(source);
+        if(operator == Token.NotFound)
+            return source.error("Expected operator in binding expression");
 
-        scanner.consumeWhitespace();
-        Token expression = ExpressionToken.produce(scanner);
-        if(expression == Token.Empty)
-            return scanner.error("Expected expression in binding expression");
+        source.consumeWhitespace();
+        Token expression = ExpressionToken.parse(source);
+        if(expression == Token.NotFound)
+            return source.error("Expected expression in binding expression");
 
-        scanner.commit();
+        source.endScan();
         return new BindingExpressionToken(identifier, operator, expression);
     }
 }
