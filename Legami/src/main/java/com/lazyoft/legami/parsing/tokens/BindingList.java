@@ -1,28 +1,31 @@
 package com.lazyoft.legami.parsing.tokens;
 
-import com.lazyoft.legami.parsing.Token;
+import com.lazyoft.legami.parsing.Scanner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BindingList extends Token {
-    public BindingList(Object ...tokens) {
+    private BindingList(Object ...tokens) {
         super(tokens);
     }
 
-    public static BindingList produce(List<Token> tokens) {
+    public static Token produce(Scanner scanner) {
         List<Token> result = new ArrayList<Token>();
-        BindingListItem item;
+        Token item;
 
         // binding-list = *(binding-list-item)
+        scanner.start();
         do {
-            item = BindingListItem.produce(tokens);
-            if (item != null)
+            item = BindingListItem.produce(scanner);
+            if(item != Token.Empty)
                 result.add(item);
-        } while(item != null);
+        } while(item != Token.Empty);
 
-        if(!result.isEmpty())
-            return new BindingList(result);
-        return null;
+        if(result.isEmpty())
+            return scanner.error("Expected Binding List");
+
+        scanner.commit();
+        return new BindingList(result);
     }
 }

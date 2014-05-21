@@ -1,40 +1,34 @@
 package com.lazyoft.legami.parsing.tokens;
 
-import com.lazyoft.legami.parsing.Token;
+import com.lazyoft.legami.parsing.Scanner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class Path extends Token {
-    public Path(Object ...tokens) {
+public class Path extends Token {
+    private Path(Object ...tokens) {
         super(tokens);
     }
 
-    public static Path produce(List<Token> tokens) {
+    public static Token produce(Scanner scanner) {
         List<Token> result = new ArrayList<Token>();
+        scanner.start();
 
         // path = identifier *[dotted-identifier]
-        Identifier identifier = Identifier.produce(tokens);
-        if(identifier != null) {
+        Token identifier = Identifier.produce(scanner);
+        while(identifier != Token.Empty) {
             result.add(identifier);
-
-            while (!tokens.isEmpty()) {
-                if (tokens.get(0) instanceof Terminals.Dot) {
-                    result.add(tokens.get(0));
-                    tokens.remove(0);
-                    Identifier other = Identifier.produce(tokens);
-                    if (identifier != null)
-                        result.add(other);
-                    else
-                        break;
-                }
-                else
-                    break;
-            }
+            if(scanner.peek() == Terminals.Dot)
+                scanner.advance();
+             else
+                break;
+            identifier = Identifier.produce(scanner);
         }
 
-        if(!result.isEmpty())
-            return new Path(result);
-        return null;
+        if(result.isEmpty())
+            return scanner.error("Expected path");
+
+        scanner.commit();
+        return new Path(result);
     }
 }

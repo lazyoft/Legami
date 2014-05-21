@@ -1,4 +1,4 @@
-package com.lazyoft.legami.parsing;
+package com.lazyoft.legami.parsing.tokens;
 
 public class TerminalToken extends Token {
     String content;

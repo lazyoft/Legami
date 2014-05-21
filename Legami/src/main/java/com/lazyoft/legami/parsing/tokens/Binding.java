@@ -1,24 +1,27 @@
 package com.lazyoft.legami.parsing.tokens;
 
-import com.lazyoft.legami.parsing.Token;
-
-import java.util.List;
+import com.lazyoft.legami.parsing.Scanner;
 
 public class Binding extends Token {
-    public Binding(Object ...tokens) {
+    private Binding(Object ...tokens) {
         super(tokens);
     }
 
-    public static Binding produce(List<Token> tokens) {
-        // binding = binding-expression / binding-list
-        BindingExpression expression = BindingExpression.produce(tokens);
-        if(expression != null)
-            return new Binding(expression);
-        else {
-            BindingList list = BindingList.produce(tokens);
-            if(list != null)
-                return new Binding(list);
+    public static Token produce(Scanner scanner) {
+        // binding = (binding-expression / binding-list) *ws
+        scanner.start();
+        Token binding = BindingExpression.produce(scanner);
+        if(binding == Token.Empty) {
+            binding = BindingList.produce(scanner);
+            if(binding == Token.Empty)
+                return scanner.error("Expected binding expression or binding list in binding");
         }
-        return null;
+
+        scanner.consumeWhitespace();
+        if(!scanner.atEnd())
+            return scanner.error("Expected end of binding");
+
+        scanner.commit();
+        return new Binding(binding);
     }
 }

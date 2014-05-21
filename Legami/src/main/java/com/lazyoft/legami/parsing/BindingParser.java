@@ -1,75 +1,19 @@
 package com.lazyoft.legami.parsing;
 
 import com.lazyoft.legami.parsing.tokens.Binding;
-import com.lazyoft.legami.parsing.tokens.Terminals;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.lazyoft.legami.parsing.tokens.Token;
 
 public class BindingParser {
-    public static Token parse(String s) {
-        List<Token> symbols = new ArrayList<Token>();
-
-        for(char c: s.toCharArray()) {
-            if(Character.isDigit(c))
-                symbols.add(new Terminals.Digit(c));
-            else if(Character.isLetter(c))
-                symbols.add(new Terminals.Letter(c));
-            else {
-                switch (c) {
-                    case '(':
-                        symbols.add(new Terminals.OpenParen());
-                        break;
-                    case ')':
-                        symbols.add(new Terminals.CloseParen());
-                        break;
-                    case '{':
-                        symbols.add(new Terminals.OpenAngular());
-                        break;
-                    case '}':
-                        symbols.add(new Terminals.CloseAngular());
-                        break;
-                    case '_':
-                        symbols.add(new Terminals.Underscore());
-                        break;
-                    case '#':
-                        symbols.add(new Terminals.Hash());
-                        break;
-                    case ' ':
-                        symbols.add(new Terminals.Whitespace());
-                        break;
-                    case '/':
-                        symbols.add(new Terminals.Quote());
-                        break;
-                    case ',':
-                        symbols.add(new Terminals.Comma());
-                        break;
-                    case '.':
-                        symbols.add(new Terminals.Dot());
-                        break;
-                    case '\\':
-                        symbols.add(new Terminals.Escape());
-                        break;
-                    case ':':
-                        symbols.add(new Terminals.Colon());
-                        break;
-                    case '-':
-                        symbols.add(new Terminals.Hyphen());
-                        break;
-                    case '=':
-                        symbols.add(new Terminals.Equal());
-                        break;
-                    default:
-                        symbols.add(Token.Nothing);
-                }
-            }
-        }
-        return Binding.produce(symbols);
+    public static Token parse(String source) {
+        return Binding.produce(new Scanner(source));
     }
 
     public static String getTokenized(String text) {
         StringBuilder builder = new StringBuilder();
-        dumpToken(builder, parse(text), 0);
+        Scanner scanner = new Scanner(text);
+        Token binding = Binding.produce(scanner);
+        dumpToken(builder, binding, 0);
+        builder.append("\n" + scanner.getError());
         return builder.toString();
     }
 
@@ -88,3 +32,4 @@ public class BindingParser {
                 dumpToken(builder, childToken, depth + 1);
     }
 }
+

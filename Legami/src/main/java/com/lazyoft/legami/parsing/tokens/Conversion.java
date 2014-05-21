@@ -1,55 +1,52 @@
 package com.lazyoft.legami.parsing.tokens;
 
-import com.lazyoft.legami.parsing.Token;
-import com.lazyoft.legami.parsing.TokenUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.lazyoft.legami.parsing.Scanner;
 
 public class Conversion extends Token {
-    public Conversion(Object ...tokens) {
+    private Conversion(Object ...tokens) {
         super(tokens);
     }
 
-    public static Conversion produce(List<Token> tokens) {
-        List<Token> result = new ArrayList<Token>();
-
+    public static Token produce(Scanner scanner) {
         // conversion = identifier open-paren *ws path *ws [comma *ws [string-literal / constant-literal ] *ws close-paren
-        Identifier identifier = Identifier.peek(tokens);
-        if(identifier != null && tokens.get(Identifier.sizeOf(identifier)) instanceof Terminals.OpenParen) {
-            result.add(identifier);
-            Identifier.consume(tokens, identifier);
-            result.add(tokens.get(0));
-            tokens.remove(0);
-            TokenUtils.consumeWhitespace(tokens);
-            Path path = Path.produce(tokens);
-            if(path != null) {
-                result.add(path);
-                TokenUtils.consumeWhitespace(tokens);
-                if(tokens.get(0) instanceof Terminals.Comma) {
-                    result.add(tokens.get(0));
-                    tokens.remove(0);
-                    TokenUtils.consumeWhitespace(tokens);
-                    StringLiteral stringLiteral = StringLiteral.produce(tokens);
-                    if(stringLiteral != null) {
-                        result.add(stringLiteral);
-                    }
-                    else {
-                        ConstantLiteral constantLiteral = ConstantLiteral.produce(tokens);
-                        if(constantLiteral != null) {
-                            result.add(constantLiteral);
-                        }
-                    }
-                    TokenUtils.consumeWhitespace(tokens);
-                    if(tokens.get(0) instanceof Terminals.CloseParen) {
-                        result.add(tokens.get(0));
-                        tokens.remove(0);
-                        return new Conversion(result);
-                    }
-                }
-            }
+        scanner.start();
+
+        Token identifier = Identifier.produce(scanner);
+        if(identifier == Token.Empty)
+            return scanner.error("Expected identifier in conversion");
+
+        if(!(scanner.peek() == Terminals.OpenParen))
+            return scanner.error("Missing open parenthesis in conversion");
+
+        scanner.advance();
+        Token path = Path.produce(scanner);
+        if(path == Token.Empty)
+            return scanner.error("Expected path in conversion");
+        scanner.consumeWhitespace();
+
+        Token remainder = Token.Empty;
+        if(scanner.peek() == Terminals.Comma) {
+            scanner.advance();
+            scanner.consumeWhitespace();
+
+            remainder = StringLiteral.produce(scanner);
+            if (remainder == Token.Empty)
+                remainder = ConstantLiteral.produce(scanner);
+
+            if (remainder == Token.Empty)
+                return scanner.error("Expecting string literal or constant expression in conversion");
+
+            scanner.consumeWhitespace();
         }
 
-        return null;
+        if(!(scanner.peek() == Terminals.CloseParen))
+            return scanner.error("Missing close parenthesis in conversion");
+
+        scanner.advance();
+        scanner.commit();
+        if(remainder != Token.Empty)
+            return new Conversion(identifier, path, remainder);
+        else
+            return new Conversion(identifier, path);
     }
 }

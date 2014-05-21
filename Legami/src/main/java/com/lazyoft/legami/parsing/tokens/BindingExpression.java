@@ -1,41 +1,32 @@
 package com.lazyoft.legami.parsing.tokens;
 
-import com.lazyoft.legami.parsing.Token;
-import com.lazyoft.legami.parsing.TokenUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.lazyoft.legami.parsing.Scanner;
 
 public class BindingExpression extends Token {
-    public BindingExpression(Object ...tokens) {
+    private BindingExpression(Object ...tokens) {
         super(tokens);
     }
 
-    public static BindingExpression produce(List<Token> tokens) {
-        List<Token> result = new ArrayList<Token>();
+    public static Token produce(Scanner scanner) {
+        // binding-expression = *ws identifier *ws operator *ws expression
+        scanner.start();
 
-        // binding-expression = *ws identifier *ws (left-bind / right-bind / left-assignment / right-assignment / full-bind) *ws expression
-        TokenUtils.consumeWhitespace(tokens);
+        scanner.consumeWhitespace();
+        Token identifier = Identifier.produce(scanner);
+        if(identifier == Token.Empty)
+            return scanner.error("Expected identifier in binding expression");
 
-        Identifier identifier = Identifier.produce(tokens);
-        if(identifier != null) {
-            result.add(identifier);
-            TokenUtils.consumeWhitespace(tokens);
-            Token operator = TokenUtils.produceOperator(tokens);
+        scanner.consumeWhitespace();
+        Token operator = Operator.produce(scanner);
+        if(operator == Token.Empty)
+            return scanner.error("Expected operator in binding expression");
 
-            if(operator != null) {
-                result.add(operator);
-                TokenUtils.consumeWhitespace(tokens);
-                Expression expression = Expression.produce(tokens);
+        scanner.consumeWhitespace();
+        Token expression = Expression.produce(scanner);
+        if(expression == Token.Empty)
+            return scanner.error("Expected expression in binding expression");
 
-                if(expression != null) {
-                    result.add(expression);
-                }
-            }
-        }
-
-        if(!result.isEmpty())
-            return new BindingExpression(result);
-        return null;
+        scanner.commit();
+        return new BindingExpression(identifier, operator, expression);
     }
 }

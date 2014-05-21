@@ -1,4 +1,4 @@
-package com.lazyoft.legami.parsing;
+package com.lazyoft.legami.parsing.tokens;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,5 +31,5 @@ public abstract class Token {
         return builder.toString();
     }
 
-    public static final Token Nothing = new Token() { public String toString() { return ""; } };
+    public static final Token Empty = new Token() { public String toString() { return ""; } };
 }

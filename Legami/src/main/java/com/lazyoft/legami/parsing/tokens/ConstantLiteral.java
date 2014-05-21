@@ -1,23 +1,25 @@
 package com.lazyoft.legami.parsing.tokens;
 
-import com.lazyoft.legami.parsing.Token;
-
-import java.util.List;
+import com.lazyoft.legami.parsing.Scanner;
 
 public class ConstantLiteral extends Token {
-    public ConstantLiteral(Object ...tokens) {
+    private ConstantLiteral(Object ...tokens) {
         super(tokens);
     }
 
-    public static ConstantLiteral produce(List<Token> tokens) {
+    public static Token produce(Scanner scanner) {
+        scanner.start();
+
         // constant-literal = hash identifier
-        if(!tokens.isEmpty() && tokens.get(0) instanceof Terminals.Hash) {
-            Identifier identifier = Identifier.produce(tokens.subList(1, tokens.size()));
-            if (identifier != null) {
-                tokens.remove(0);
-                return new ConstantLiteral(new Terminals.Hash(), identifier);
-            }
+        if(scanner.next() == Terminals.Hash) {
+            Token identifier = Identifier.produce(scanner);
+            if (identifier == null)
+                return scanner.error("Expected identifier in constant literal");
+
+            scanner.commit();
+            return new ConstantLiteral(identifier);
         }
-        return null;
+
+        return scanner.error("Expected constant literal prefix");
     }
 }
