@@ -1,7 +1,7 @@
 package com.lazyoft.legami.parsing;
 
-public class Expression extends Token {
-    private Expression(Object ...tokens) {
+public class ExpressionToken extends Token {
+    private ExpressionToken(Object... tokens) {
         super(tokens);
     }
 
@@ -9,18 +9,18 @@ public class Expression extends Token {
         // expression = constant-literal / conversion / path
         scanner.start();
 
-        Token expression = Conversion.produce(scanner);
+        Token expression = ConversionToken.produce(scanner);
         if(expression == Token.Empty) {
-            expression = ConstantLiteral.produce(scanner);
+            expression = ConstantLiteralToken.produce(scanner);
             if(expression == Token.Empty) {
-                expression = Path.produce(scanner);
+                expression = PathToken.produce(scanner);
             }
         }
         if(expression == null)
             return scanner.error("Expected constant expression, conversion expression or path");
 
         scanner.commit();
-        return new Expression(expression);
+        return new ExpressionToken(expression);
     }
 }
 

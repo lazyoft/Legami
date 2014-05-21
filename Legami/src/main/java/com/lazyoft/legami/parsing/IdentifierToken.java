@@ -3,8 +3,8 @@ package com.lazyoft.legami.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Identifier extends Token {
-    private Identifier(Object ...tokens) {
+public class IdentifierToken extends Token {
+    private IdentifierToken(Object... tokens) {
         super(tokens);
     }
 
@@ -27,6 +27,6 @@ public class Identifier extends Token {
             return scanner.error("Expected identifier");
 
         scanner.commit();
-        return new Identifier(result);
+        return new IdentifierToken(result);
     }
 }

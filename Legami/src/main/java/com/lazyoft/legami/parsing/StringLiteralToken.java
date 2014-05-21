@@ -3,8 +3,8 @@ package com.lazyoft.legami.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringLiteral extends Token {
-    private StringLiteral(Object ...tokens) {
+public class StringLiteralToken extends Token {
+    private StringLiteralToken(Object... tokens) {
         super(tokens);
     }
 
@@ -27,6 +27,6 @@ public class StringLiteral extends Token {
 
         scanner.advance();
         scanner.commit();
-        return new StringLiteral(result);
+        return new StringLiteralToken(result);
     }
 }

@@ -1,7 +1,7 @@
 package com.lazyoft.legami.parsing;
 
-public class BindingExpression extends Token {
-    private BindingExpression(Object ...tokens) {
+public class BindingExpressionToken extends Token {
+    private BindingExpressionToken(Object... tokens) {
         super(tokens);
     }
 
@@ -10,21 +10,21 @@ public class BindingExpression extends Token {
         scanner.start();
 
         scanner.consumeWhitespace();
-        Token identifier = Identifier.produce(scanner);
+        Token identifier = IdentifierToken.produce(scanner);
         if(identifier == Token.Empty)
             return scanner.error("Expected identifier in binding expression");
 
         scanner.consumeWhitespace();
-        Token operator = Operator.produce(scanner);
+        Token operator = OperatorToken.produce(scanner);
         if(operator == Token.Empty)
             return scanner.error("Expected operator in binding expression");
 
         scanner.consumeWhitespace();
-        Token expression = Expression.produce(scanner);
+        Token expression = ExpressionToken.produce(scanner);
         if(expression == Token.Empty)
             return scanner.error("Expected expression in binding expression");
 
         scanner.commit();
-        return new BindingExpression(identifier, operator, expression);
+        return new BindingExpressionToken(identifier, operator, expression);
     }
 }

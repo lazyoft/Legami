@@ -3,8 +3,8 @@ package com.lazyoft.legami.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BindingList extends Token {
-    private BindingList(Object ...tokens) {
+public class BindingListToken extends Token {
+    private BindingListToken(Object... tokens) {
         super(tokens);
     }
 
@@ -15,7 +15,7 @@ public class BindingList extends Token {
         // binding-list = *(binding-list-item)
         scanner.start();
         do {
-            item = BindingListItem.produce(scanner);
+            item = BindingListItemToken.produce(scanner);
             if(item != Token.Empty)
                 result.add(item);
         } while(item != Token.Empty);
@@ -24,6 +24,6 @@ public class BindingList extends Token {
             return scanner.error("Expected Binding List");
 
         scanner.commit();
-        return new BindingList(result);
+        return new BindingListToken(result);
     }
 }

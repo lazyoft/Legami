@@ -1,7 +1,7 @@
 package com.lazyoft.legami.parsing;
 
-public class BindingListItem extends Token {
-    private BindingListItem(Object ...tokens) {
+public class BindingListItemToken extends Token {
+    private BindingListItemToken(Object... tokens) {
         super(tokens);
     }
 
@@ -14,7 +14,7 @@ public class BindingListItem extends Token {
             return scanner.error("Expected open angular in binding list item");
 
         scanner.consumeWhitespace();
-        Token expression = BindingExpression.produce(scanner);
+        Token expression = BindingExpressionToken.produce(scanner);
         if(expression == Token.Empty)
             return scanner.error("Expected binding expression in binding list item");
 
@@ -23,6 +23,6 @@ public class BindingListItem extends Token {
             return scanner.error("Expected close angular in binding list item");
 
         scanner.commit();
-        return new BindingListItem(expression);
+        return new BindingListItemToken(expression);
     }
 }

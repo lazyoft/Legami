@@ -3,8 +3,8 @@ package com.lazyoft.legami.parsing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Path extends Token {
-    private Path(Object ...tokens) {
+public class PathToken extends Token {
+    private PathToken(Object... tokens) {
         super(tokens);
     }
 
@@ -13,20 +13,20 @@ public class Path extends Token {
         scanner.start();
 
         // path = identifier *[dotted-identifier]
-        Token identifier = Identifier.produce(scanner);
+        Token identifier = IdentifierToken.produce(scanner);
         while(identifier != Token.Empty) {
             result.add(identifier);
             if(scanner.peek() == Terminals.Dot)
                 scanner.advance();
              else
                 break;
-            identifier = Identifier.produce(scanner);
+            identifier = IdentifierToken.produce(scanner);
         }
 
         if(result.isEmpty())
             return scanner.error("Expected path");
 
         scanner.commit();
-        return new Path(result);
+        return new PathToken(result);
     }
 }

@@ -1,6 +1,6 @@
 package com.lazyoft.legami.parsing;
 
-public class Operator {
+public class OperatorToken {
     public static Token produce(Scanner scanner) {
         // operator = left-bind / right-bind / left-assignment / right-assignment / full-bind
         scanner.start();

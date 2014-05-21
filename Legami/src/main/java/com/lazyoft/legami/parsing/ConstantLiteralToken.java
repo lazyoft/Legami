@@ -1,7 +1,7 @@
 package com.lazyoft.legami.parsing;
 
-public class ConstantLiteral extends Token {
-    private ConstantLiteral(Object ...tokens) {
+public class ConstantLiteralToken extends Token {
+    private ConstantLiteralToken(Object... tokens) {
         super(tokens);
     }
 
@@ -10,12 +10,12 @@ public class ConstantLiteral extends Token {
 
         // constant-literal = hash identifier
         if(scanner.next() == Terminals.Hash) {
-            Token identifier = Identifier.produce(scanner);
+            Token identifier = IdentifierToken.produce(scanner);
             if (identifier == null)
                 return scanner.error("Expected identifier in constant literal");
 
             scanner.commit();
-            return new ConstantLiteral(identifier);
+            return new ConstantLiteralToken(identifier);
         }
 
         return scanner.error("Expected constant literal prefix");

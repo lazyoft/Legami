@@ -1,7 +1,7 @@
 package com.lazyoft.legami.parsing;
 
-public class Conversion extends Token {
-    private Conversion(Object ...tokens) {
+public class ConversionToken extends Token {
+    private ConversionToken(Object... tokens) {
         super(tokens);
     }
 
@@ -9,7 +9,7 @@ public class Conversion extends Token {
         // conversion = identifier open-paren *ws path *ws [comma *ws [string-literal / constant-literal ] *ws close-paren
         scanner.start();
 
-        Token identifier = Identifier.produce(scanner);
+        Token identifier = IdentifierToken.produce(scanner);
         if(identifier == Token.Empty)
             return scanner.error("Expected identifier in conversion");
 
@@ -17,7 +17,7 @@ public class Conversion extends Token {
             return scanner.error("Missing open parenthesis in conversion");
 
         scanner.advance();
-        Token path = Path.produce(scanner);
+        Token path = PathToken.produce(scanner);
         if(path == Token.Empty)
             return scanner.error("Expected path in conversion");
         scanner.consumeWhitespace();
@@ -27,9 +27,9 @@ public class Conversion extends Token {
             scanner.advance();
             scanner.consumeWhitespace();
 
-            remainder = StringLiteral.produce(scanner);
+            remainder = StringLiteralToken.produce(scanner);
             if (remainder == Token.Empty)
-                remainder = ConstantLiteral.produce(scanner);
+                remainder = ConstantLiteralToken.produce(scanner);
 
             if (remainder == Token.Empty)
                 return scanner.error("Expecting string literal or constant expression in conversion");
@@ -43,8 +43,8 @@ public class Conversion extends Token {
         scanner.advance();
         scanner.commit();
         if(remainder != Token.Empty)
-            return new Conversion(identifier, path, remainder);
+            return new ConversionToken(identifier, path, remainder);
         else
-            return new Conversion(identifier, path);
+            return new ConversionToken(identifier, path);
     }
 }

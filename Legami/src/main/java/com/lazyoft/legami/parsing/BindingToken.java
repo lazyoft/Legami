@@ -1,16 +1,16 @@
 package com.lazyoft.legami.parsing;
 
-public class Binding extends Token {
-    private Binding(Object ...tokens) {
+public class BindingToken extends Token {
+    private BindingToken(Object... tokens) {
         super(tokens);
     }
 
     public static Token produce(Scanner scanner) {
         // binding = (binding-expression / binding-list) *ws
         scanner.start();
-        Token binding = BindingExpression.produce(scanner);
+        Token binding = BindingExpressionToken.produce(scanner);
         if(binding == Token.Empty) {
-            binding = BindingList.produce(scanner);
+            binding = BindingListToken.produce(scanner);
             if(binding == Token.Empty)
                 return scanner.error("Expected binding expression or binding list in binding");
         }
@@ -20,6 +20,6 @@ public class Binding extends Token {
             return scanner.error("Expected end of binding");
 
         scanner.commit();
-        return new Binding(binding);
+        return new BindingToken(binding);
     }
 }

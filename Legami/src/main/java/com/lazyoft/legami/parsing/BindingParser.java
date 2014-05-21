@@ -2,13 +2,13 @@ package com.lazyoft.legami.parsing;
 
 public class BindingParser {
     public static Token parse(String source) {
-        return Binding.produce(new Scanner(source));
+        return BindingToken.produce(new Scanner(source));
     }
 
     public static String getTokenized(String text) {
         StringBuilder builder = new StringBuilder();
         Scanner scanner = new Scanner(text);
-        Token binding = Binding.produce(scanner);
+        Token binding = BindingToken.produce(scanner);
         dumpToken(builder, binding, 0);
         builder.append("\n" + scanner.getError());
         return builder.toString();
