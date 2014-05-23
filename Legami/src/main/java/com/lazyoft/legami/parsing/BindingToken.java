@@ -5,6 +5,11 @@ public class BindingToken extends Token {
         super(tokens);
     }
 
+    @Override
+    public String toString() {
+        return getTokens().get(0).toString();
+    }
+
     public static Token parse(TokenSource source) {
         // binding = (binding-expression / binding-list) *ws
         source.startScan();

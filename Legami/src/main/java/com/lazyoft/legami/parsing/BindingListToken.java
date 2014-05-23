@@ -8,6 +8,11 @@ public class BindingListToken extends Token {
         super(tokens);
     }
 
+    @Override
+    public String toString() {
+        return getTokens().toString().substring(1, getTokens().toString().length() - 1);
+    }
+
     public static Token parse(TokenSource source) {
         List<Token> result = new ArrayList<Token>();
         Token item;

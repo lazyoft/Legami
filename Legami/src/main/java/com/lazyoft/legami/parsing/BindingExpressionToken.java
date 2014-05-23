@@ -5,6 +5,23 @@ public class BindingExpressionToken extends Token {
         super(tokens);
     }
 
+    public String getSourceName() {
+        return ((IdentifierToken)getTokens().get(0)).getName();
+    }
+
+    public Token getOperator() {
+        return getTokens().get(1);
+    }
+
+    public Token getExpression() {
+        return getTokens().get(2);
+    }
+
+    @Override
+    public String toString() {
+        return "Binding[" + getSourceName() + " " + getOperator().toString() + " " + getExpression().toString() + "]";
+    }
+
     public static Token parse(TokenSource source) {
         // binding-expression = *ws identifier *ws operator *ws expression
         source.startScan();

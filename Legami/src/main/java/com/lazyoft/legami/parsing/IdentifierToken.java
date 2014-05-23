@@ -4,12 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IdentifierToken extends Token {
-    private IdentifierToken(Object... tokens) {
-        super(tokens);
+    private String name;
+
+    private IdentifierToken(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Identifier[" + name + "]";
     }
 
     static Token parse(TokenSource source) {
-        List<Token> result = new ArrayList<Token>();
+        StringBuilder result = new StringBuilder();
         source.startScan();
 
         // identifier = letter / underscore *[letter / underscore / digit]
@@ -17,16 +28,16 @@ public class IdentifierToken extends Token {
         if(current instanceof Terminals.Letter || current == Terminals.Underscore) {
             do {
                 source.advance();
-                result.add(current);
+                result.append(current.toString());
                 current = source.peek();
             }
             while (current != Token.NotFound && (current instanceof Terminals.Letter || current == Terminals.Underscore || current instanceof Terminals.Digit));
         }
 
-        if(result.isEmpty())
+        if(result.length() == 0)
             return source.error("Expected identifier");
 
         source.endScan();
-        return new IdentifierToken(result);
+        return new IdentifierToken(result.toString());
     }
 }

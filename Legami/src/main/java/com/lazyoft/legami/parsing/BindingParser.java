@@ -1,17 +1,14 @@
 package com.lazyoft.legami.parsing;
 
 public class BindingParser {
-    public static Token parse(String source) {
-        return BindingToken.parse(new TokenSource(source));
+    public static ParseResult parse(String source) {
+        TokenSource tokenSource = new TokenSource(source);
+        Token result = BindingToken.parse(tokenSource);
+        return result == Token.NotFound ? new ParseResult(tokenSource.getErrorMessage()) : new ParseResult(result);
     }
 
-    public static String getTokenized(String text) {
-        StringBuilder builder = new StringBuilder();
-        TokenSource source = new TokenSource(text);
-        Token binding = BindingToken.parse(source);
-        dumpToken(builder, binding, 0);
-        builder.append("\n" + source.getErrorMessage());
-        return builder.toString();
+    public static String getTokenized(String source) {
+        return parse(source).toString();
     }
 
     static void dumpToken(StringBuilder builder, Token token, int depth)

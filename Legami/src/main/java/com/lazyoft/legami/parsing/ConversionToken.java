@@ -1,8 +1,28 @@
 package com.lazyoft.legami.parsing;
 
+import java.util.List;
+
 public class ConversionToken extends Token {
     private ConversionToken(Object... tokens) {
         super(tokens);
+    }
+
+    public String getName() {
+        return ((IdentifierToken)getTokens().get(0)).getName();
+    }
+
+    public Token getPath() {
+        return getTokens().get(1);
+    }
+
+    public Token getParameter() {
+        return getTokens().size() > 2 ? getTokens().get(2) : Token.NotFound;
+    }
+
+    @Override
+    public String toString() {
+        String parameter = getParameter() == Token.NotFound ? "" : ", " + getParameter().toString();
+        return "Conversion[" + getName() + "(" + getPath() + parameter + ")]";
     }
 
     public static Token parse(TokenSource source) {
@@ -22,7 +42,8 @@ public class ConversionToken extends Token {
         source.consumeWhitespace();
 
         Token remainder = Token.NotFound;
-        if(source.next() == Terminals.Comma) {
+        if(source.peek() == Terminals.Comma) {
+            source.advance();
             source.consumeWhitespace();
 
             remainder = StringLiteralToken.parse(source);

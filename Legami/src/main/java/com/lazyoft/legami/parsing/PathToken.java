@@ -4,8 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PathToken extends Token {
-    private PathToken(Object... tokens) {
-        super(tokens);
+
+    private PathToken(Object ...identifiers) {
+        super(identifiers);
+    }
+
+    public List<Token> getIdentifiers() {
+        return getTokens();
+    }
+
+    @Override
+    public String toString() {
+        return "Path[" + getTokens().toString().substring(1, getTokens().toString().length() - 1) + "]";
     }
 
     public static Token parse(TokenSource source) {

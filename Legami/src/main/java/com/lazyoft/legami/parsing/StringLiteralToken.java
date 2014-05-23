@@ -4,29 +4,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StringLiteralToken extends Token {
-    private StringLiteralToken(Object... tokens) {
-        super(tokens);
+    private String text;
+
+    private StringLiteralToken(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    @Override
+    public String toString() {
+        return "String[" + text + "]";
     }
 
     public static Token parse(TokenSource source) {
-        List<Token> result = new ArrayList<Token>();
+        StringBuilder result = new StringBuilder();
         source.startScan();
 
         // string-literal = quote *char-in-string quote
         Token current = source.next();
         if(current == Terminals.Quote) {
             do {
-                result.add(source.next());
+                result.append(source.next().toString());
                 current = source.peek();
+                if(current == Terminals.Escape && source.peek(1) == Terminals.Quote)
+                    source.advance();
             }
             while (current != Token.NotFound && (current != Terminals.Quote) || (current == Terminals.Quote && source.peek(-1) == Terminals.Escape));
         }
 
-        if(result.isEmpty())
+        if(result.length() == 0)
             return source.error("Expected string literal");
 
         source.advance();
         source.endScan();
-        return new StringLiteralToken(result);
+        return new StringLiteralToken(result.toString());
     }
 }

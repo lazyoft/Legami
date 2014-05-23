@@ -1,8 +1,19 @@
 package com.lazyoft.legami.parsing;
 
 public class ConstantLiteralToken extends Token {
-    private ConstantLiteralToken(Object... tokens) {
-        super(tokens);
+    private String name;
+
+    private ConstantLiteralToken(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Constant[" + name + "]";
     }
 
     public static Token parse(TokenSource source) {
@@ -15,7 +26,7 @@ public class ConstantLiteralToken extends Token {
                 return source.error("Expected identifier in constant literal");
 
             source.endScan();
-            return new ConstantLiteralToken(identifier);
+            return new ConstantLiteralToken(((IdentifierToken)identifier).getName());
         }
 
         return source.error("Expected constant literal prefix");
