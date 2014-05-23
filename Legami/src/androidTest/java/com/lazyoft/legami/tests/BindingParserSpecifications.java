@@ -5,36 +5,79 @@ import com.lazyoft.legami.parsing.BindingParser;
 import junit.framework.TestCase;
 
 public class BindingParserSpecifications extends TestCase {
-    public void test1() {
-        assertEquals("", BindingParser.getTokenized("foo := function(One.Two.Three, #barbapapa)"));
+    public void testShouldParseSimpleAssignments() {
+        assertEquals("Binding[foo := Path[Identifier[bar]]]", BindingParser.getTokenized("foo := bar"));
     }
 
-    public void test2() {
-        assertEquals("", BindingParser.getTokenized("foo := #barbapapa"));
+    public void testShouldFailIfTheAssignmentIsIncomplete() {
+        assertTrue(BindingParser.parse("foo := ").hasError());
     }
 
-    public void test3() {
-        assertEquals("", BindingParser.getTokenized("foo := One.Two.Three"));
+    public void testShouldFailIfTheOperatorIsUnrecognized() {
+        assertTrue(BindingParser.parse("foo += bar").hasError());
     }
 
-    public void test4() {
-        assertEquals("", BindingParser.getTokenized("foo := function(One.Two.Three, /string literal/)"));
+    public void testShouldFailIfThereIsNoIdentifierAtTheStart() {
+        assertTrue(BindingParser.parse(":= bar").hasError());
     }
 
-    public void test5() {
-        assertEquals("", BindingParser.getTokenized("foo := function(One.Two.Three, /string literal with an \\/escape\\/ quote/)"));
+    public void testShouldParsePathAssignments() {
+        assertEquals("Binding[foo := Path[Identifier[bar], Identifier[baz]]]", BindingParser.getTokenized("foo := bar.baz"));
     }
 
-    public void test6() {
-        assertEquals("", BindingParser.getTokenized("foo := function(One.Two.Three, /string literal with weird chars '+?^%@àèìòù/)"));
+    public void testShouldIgnoreEndingPathSpecifiersInPath() {
+        assertEquals("Binding[foo := Path[Identifier[bar], Identifier[baz]]]", BindingParser.getTokenized("foo := bar.baz."));
     }
 
-    public void test7() {
-        assertEquals("", BindingParser.getTokenized("{ foo := function(One.Two.Three, /string literal with weird chars '+?^%@àèìòù/) } { second := #res } { third := some.path }"));
+    public void testShouldParseConstantAssignments() {
+        assertEquals("Binding[foo := Constant[constantValue]]", BindingParser.getTokenized("foo := #constantValue"));
     }
 
-    public void test8() {
-        assertEquals("", BindingParser.getTokenized("{ foo := function(One.Two.Three, /string literal with weird chars '+?^%@àèìòù/) } second := #res"));
+    public void testShouldFailIfTheConstantAssignmentIsIncomplete() {
+        assertTrue(BindingParser.parse("foo := #").hasError());
     }
 
+    public void testShouldParseSimpleConversions() {
+        assertEquals("Binding[foo := Conversion[convert(Path[Identifier[bar]])]]", BindingParser.getTokenized("foo := convert(bar)"));
+    }
+
+    public void testShouldFailIfTheConversionIsMissingAParenthesis() {
+        assertTrue(BindingParser.parse("foo := convert(bar").hasError());
+    }
+
+    public void testShouldParseConversionsWithStringParameters() {
+        assertEquals("Binding[foo := Conversion[convert(Path[Identifier[bar], Identifier[baz]], String[string literal])]]", BindingParser.getTokenized("foo := convert(bar.baz, /string literal/)"));
+    }
+
+    public void testShouldParseConversionsWithEscapedStringsParameters() {
+        assertEquals("Binding[foo := Conversion[convert(Path[Identifier[bar], Identifier[baz]], String[string/literal])]]", BindingParser.getTokenized("foo := convert(bar.baz, /string\\/literal/)"));
+    }
+
+    public void testShouldParseConversionsWithEscapedStringsParametersPreservingRealEscapedText() {
+        assertEquals("Binding[foo := Conversion[convert(Path[Identifier[bar], Identifier[baz]], String[string/literal\\nNew line])]]", BindingParser.getTokenized("foo := convert(bar.baz, /string\\/literal\\nNew line/)"));
+    }
+
+    public void testShouldFailTheConversionIfMissingTheParameterWithAComma() {
+        assertTrue(BindingParser.parse("foo := convert(bar,)").hasError());
+    }
+
+    public void testShouldParseConversionsWithConstantParameters() {
+        assertEquals("Binding[foo := Conversion[convert(Path[Identifier[bar], Identifier[baz]], Constant[constantValue])]]", BindingParser.getTokenized("foo := convert(bar.baz, #constantValue)"));
+    }
+
+    public void testShouldFailTheConversionIfMissingTheIdentifierInAConstantParameter() {
+        assertTrue(BindingParser.parse("foo := convert(bar.baz, #)").hasError());
+    }
+
+    public void testShouldParseMultipleBindingsIfEnclosedInAngularBrackets() {
+        assertEquals("Binding[foo := Path[Identifier[bar]]], Binding[baz =: Path[Identifier[goo]]]", BindingParser.getTokenized("{foo := bar} {baz =: goo}"));
+    }
+
+    public void testShouldParseMultipleBindingsIfEnclosedInAngularBracketsRegardlessOfWhitespace() {
+        assertEquals("Binding[foo := Path[Identifier[bar]]], Binding[baz =: Path[Identifier[goo]]]", BindingParser.getTokenized("    {foo := bar} {baz =: goo}  "));
+    }
+
+    public void testShouldFailMultipleBindingsNotEnclosedInAngularBrackets() {
+        assertTrue(BindingParser.parse("{foo := bar} baz := goo").hasError());
+    }
 }
