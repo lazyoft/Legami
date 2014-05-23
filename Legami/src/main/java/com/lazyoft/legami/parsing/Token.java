@@ -4,20 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Token {
-    private List<Token> constituents;
+    private List<Token> tokens;
 
-    public List<Token> getConstituents() {
-        return constituents;
+    public List<Token> getTokens() {
+        return tokens;
     }
 
     public Token(Object ...tokens) {
-        constituents = new ArrayList<Token>();
+        this.tokens = new ArrayList<Token>();
         for(Object token : tokens) {
             if(token instanceof Token)
-                constituents.add((Token)token);
+                this.tokens.add((Token) token);
             else if(token instanceof List)
                 for(Object subToken : (List)token)
-                    constituents.add((Token)subToken);
+                    this.tokens.add((Token) subToken);
             else
                 throw new RuntimeException("Error while constructing token");
         }
@@ -26,10 +26,10 @@ public abstract class Token {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        for(Token constituent: constituents)
-            builder.append(constituent.toString());
+        for(Token token: tokens)
+            builder.append(token.toString());
         return builder.toString();
     }
 
-    public static final Token Nothing = new Token() { public String toString() { return ""; } };
+    public static final Token NotFound = new Token() { public String toString() { return ""; } };
 }
