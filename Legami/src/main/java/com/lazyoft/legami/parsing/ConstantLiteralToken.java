@@ -1,5 +1,7 @@
 package com.lazyoft.legami.parsing;
 
+import com.lazyoft.legami.binding.ITokenVisitor;
+
 public class ConstantLiteralToken extends Token {
     private String name;
 
@@ -14,6 +16,11 @@ public class ConstantLiteralToken extends Token {
     @Override
     public String toString() {
         return "Constant[" + name + "]";
+    }
+
+    @Override
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 
     public static Token parse(TokenSource source) {

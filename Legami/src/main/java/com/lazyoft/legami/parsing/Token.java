@@ -1,9 +1,12 @@
 package com.lazyoft.legami.parsing;
 
+import com.lazyoft.legami.binding.ITokenVisitor;
+import com.lazyoft.legami.binding.ITokenVisitorAcceptor;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Token {
+public abstract class Token implements ITokenVisitorAcceptor {
     private List<Token> tokens;
 
     public List<Token> getTokens() {
@@ -21,6 +24,10 @@ public abstract class Token {
             else
                 throw new RuntimeException("Error while constructing token");
         }
+    }
+
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 
     @Override

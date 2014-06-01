@@ -1,6 +1,6 @@
 package com.lazyoft.legami.parsing;
 
-import java.util.List;
+import com.lazyoft.legami.binding.ITokenVisitor;
 
 public class ConversionToken extends Token {
     private ConversionToken(Object... tokens) {
@@ -23,6 +23,11 @@ public class ConversionToken extends Token {
     public String toString() {
         String parameter = getParameter() == Token.NotFound ? "" : ", " + getParameter().toString();
         return "Conversion[" + getName() + "(" + getPath() + parameter + ")]";
+    }
+
+    @Override
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 
     public static Token parse(TokenSource source) {
