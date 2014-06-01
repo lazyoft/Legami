@@ -1,5 +1,7 @@
 package com.lazyoft.legami.parsing;
 
+import com.lazyoft.legami.binding.ITokenVisitor;
+
 public class BindingToken extends Token {
     private BindingToken(Object... tokens) {
         super(tokens);
@@ -8,6 +10,11 @@ public class BindingToken extends Token {
     @Override
     public String toString() {
         return getTokens().get(0).toString();
+    }
+
+    @Override
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 
     public static Token parse(TokenSource source) {

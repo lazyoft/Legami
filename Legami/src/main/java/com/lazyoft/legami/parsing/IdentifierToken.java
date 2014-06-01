@@ -1,7 +1,6 @@
 package com.lazyoft.legami.parsing;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.lazyoft.legami.binding.ITokenVisitor;
 
 public class IdentifierToken extends Token {
     private String name;
@@ -12,6 +11,11 @@ public class IdentifierToken extends Token {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 
     @Override

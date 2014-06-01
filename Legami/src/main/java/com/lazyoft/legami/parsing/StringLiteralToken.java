@@ -1,7 +1,6 @@
 package com.lazyoft.legami.parsing;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.lazyoft.legami.binding.ITokenVisitor;
 
 public class StringLiteralToken extends Token {
     private String text;
@@ -17,6 +16,11 @@ public class StringLiteralToken extends Token {
     @Override
     public String toString() {
         return "String[" + text + "]";
+    }
+
+    @Override
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 
     public static Token parse(TokenSource source) {

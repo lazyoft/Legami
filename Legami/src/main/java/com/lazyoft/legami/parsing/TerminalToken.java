@@ -1,6 +1,8 @@
 package com.lazyoft.legami.parsing;
 
-class TerminalToken extends Token {
+import com.lazyoft.legami.binding.ITokenVisitor;
+
+public class TerminalToken extends Token {
     String content;
 
     public TerminalToken(String content) {
@@ -10,5 +12,10 @@ class TerminalToken extends Token {
     @Override
     public String toString() {
         return content;
+    }
+
+    @Override
+    public <TResult> TResult acceptVisitor(ITokenVisitor<TResult> visitor, TResult param) {
+        return visitor.visit(this, param);
     }
 }
