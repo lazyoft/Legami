@@ -1,30 +1,19 @@
 package com.lazyoft.legami.accessors;
 
-import com.lazyoft.legami.logging.ILoggable;
-import com.lazyoft.legami.logging.ILogger;
-import com.lazyoft.legami.logging.NullLogger;
-
-public class IdentityAccessor implements IAccessor, ILoggable {
-    private ILogger logger;
-    private Object source;
-
-    public IdentityAccessor(Object source) {
-        logger = NullLogger.instance;
-        this.source = source;
+public class IdentityAccessor extends ChainedAccessorBase {
+    @Override
+    protected Object internalGet(String path, Object source) {
+        if(path.equals("this"))
+            return source;
+        return Accessor.cannotSolve;
     }
 
     @Override
-    public Object get() {
-        return source;
-    }
-
-    @Override
-    public void set(Object value) {
-        logger.warn("Attempted to set identity. Ignoring.");
-    }
-
-    @Override
-    public void setLogger(ILogger logger) {
-        this.logger = logger;
+    protected boolean internalSet(String path, Object source, Object value) {
+        if(path.equals("this")) {
+            logger.warn("Cannot set 'this' property");
+            return true;
+        }
+        return false;
     }
 }

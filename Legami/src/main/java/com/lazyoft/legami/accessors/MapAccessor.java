@@ -2,22 +2,26 @@ package com.lazyoft.legami.accessors;
 
 import java.util.Map;
 
-public class MapAccessor implements IAccessor {
-    private final Map<String, Object> source;
-    private final String path;
+public class MapAccessor extends ChainedAccessorBase {
+    @Override
+    protected Object internalGet(String path, Object source) {
+        if(!(source instanceof Map))
+            return Accessor.cannotSolve;
 
-    public MapAccessor(Map<String, Object> source, String path) {
-        this.source = source;
-        this.path = path;
+        Map map = (Map)source;
+        if(map.containsKey(path))
+            return map.get(path);
+
+        logger.warn("Key " + path + " cannot be found on map. Returning noValue");
+        return Accessor.noValue;
     }
 
     @Override
-    public Object get() {
-        return source.containsKey(path) ? source.get(path) : Accessor.NoValue;
-    }
+    protected boolean internalSet(String path, Object source, Object value) {
+        if(!(source instanceof Map))
+            return false;
 
-    @Override
-    public void set(Object value) {
-        source.put(path, value);
+        ((Map)source).put(path, value);
+        return true;
     }
 }
