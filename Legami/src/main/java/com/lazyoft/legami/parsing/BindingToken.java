@@ -1,7 +1,5 @@
 package com.lazyoft.legami.parsing;
 
-import com.lazyoft.legami.binding.ITokenVisitor;
-
 public class BindingToken extends Token {
     private BindingToken(Object... tokens) {
         super(tokens);

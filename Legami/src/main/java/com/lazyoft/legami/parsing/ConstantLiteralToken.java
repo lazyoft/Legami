@@ -1,7 +1,5 @@
 package com.lazyoft.legami.parsing;
 
-import com.lazyoft.legami.binding.ITokenVisitor;
-
 public class ConstantLiteralToken extends Token {
     private String name;
 

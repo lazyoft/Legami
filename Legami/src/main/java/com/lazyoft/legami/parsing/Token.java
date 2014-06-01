@@ -1,8 +1,5 @@
 package com.lazyoft.legami.parsing;
 
-import com.lazyoft.legami.binding.ITokenVisitor;
-import com.lazyoft.legami.binding.ITokenVisitorAcceptor;
-
 import java.util.ArrayList;
 import java.util.List;
 

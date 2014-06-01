@@ -1,7 +1,5 @@
 package com.lazyoft.legami.parsing;
 
-import com.lazyoft.legami.binding.ITokenVisitor;
-
 public class ConversionToken extends Token {
     private ConversionToken(Object... tokens) {
         super(tokens);
