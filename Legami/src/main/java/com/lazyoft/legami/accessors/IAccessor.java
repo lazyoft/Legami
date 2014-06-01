@@ -1,7 +1,7 @@
 package com.lazyoft.legami.accessors;
 
 public interface IAccessor {
-    Object get();
-    void set(Object value);
+    boolean set(String path, Object source, Object value);
+    Object get(String path, Object source);
 }
 
