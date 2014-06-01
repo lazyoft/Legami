@@ -2,10 +2,13 @@
 
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
     }
+
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.10.+'
+        classpath 'org.robolectric.gradle:gradle-android-test-plugin:0.10.+'
     }
 }
 
