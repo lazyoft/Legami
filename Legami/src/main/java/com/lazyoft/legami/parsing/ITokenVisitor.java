@@ -1,4 +1,4 @@
-package com.lazyoft.legami.binding;
+package com.lazyoft.legami.parsing;
 
 import com.lazyoft.legami.parsing.BindingExpressionToken;
 import com.lazyoft.legami.parsing.BindingListItemToken;
