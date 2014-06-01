@@ -1,62 +1,41 @@
 package com.lazyoft.legami.accessors;
 
-import com.lazyoft.legami.logging.ILoggable;
-import com.lazyoft.legami.logging.ILogger;
-import com.lazyoft.legami.logging.NullLogger;
-import com.lazyoft.legami.helpers.IPropertyHelper;
-import com.lazyoft.legami.helpers.Lazy;
+import com.lazyoft.legami.helpers.IReflectionHelper;
 
 import java.lang.reflect.Method;
 
-import rx.functions.Func0;
+public class PropertyAccessor extends ChainedAccessorBase {
+    private IReflectionHelper helper;
 
-public class PropertyAccessor implements IAccessor, ILoggable {
-    private final Object source;
-    private final String path;
-    private final Lazy<Method> getterMethod;
-    private final Lazy<Method> setterMethod;
-    private ILogger logger;
-
-    public PropertyAccessor(final Object source, final String path, final IPropertyHelper helper) {
-        this.source = source;
-        this.path = path;
-        this.logger = NullLogger.instance;
-
-        getterMethod = new Lazy<Method>(new Func0<Method>() {
-            @Override
-            public Method call() {
-                return helper.getGetter(source.getClass(), path);
-            }
-        });
-        setterMethod = new Lazy<Method>(new Func0<Method>() {
-            @Override
-            public Method call() {
-                return helper.getSetter(source.getClass(), path);
-            }
-        });
+    public PropertyAccessor(final IReflectionHelper helper) {
+        this.helper = helper;
     }
 
     @Override
-    public Object get() {
+    public Object internalGet(String path, Object source) {
         try {
-            return getterMethod.value().invoke(source);
+            Method getter = helper.getGetter(source.getClass(), path);
+            if(getter == null)
+                return Accessor.cannotSolve;
+
+            return getter.invoke(source);
         } catch (Exception e) {
-            logger.warn("Property " + path + " cannot be accessed. Returning NoValue");
-            return Accessor.NoValue;
+            logger.warn("Property " + path + " cannot be accessed. Returning noValue");
+            return Accessor.noValue;
         }
     }
 
     @Override
-    public void set(Object value) {
+    public boolean internalSet(String path, Object source, Object value) {
+        Method setter = helper.getSetter(source.getClass(), path);
+        if(setter == null)
+            return false;
+
         try {
-            setterMethod.value().invoke(source, value);
+            setter.invoke(source, value);
         } catch (Exception e) {
             logger.warn("Property " + path + "cannot be set.");
         }
-    }
-
-    @Override
-    public void setLogger(ILogger logger) {
-        this.logger = logger;
+        return true;
     }
 }
