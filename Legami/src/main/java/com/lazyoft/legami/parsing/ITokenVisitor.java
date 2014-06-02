@@ -13,6 +13,7 @@ import com.lazyoft.legami.parsing.Token;
 
 public interface ITokenVisitor<TResult> {
     TResult visit(Token token, TResult partial);
+    TResult visit(IdentifierToken token, TResult partial);
     TResult visit(BindingToken token, TResult partial);
     TResult visit(ExpressionToken token, TResult partial);
     TResult visit(PathToken token, TResult partial);
