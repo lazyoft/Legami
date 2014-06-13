@@ -2,11 +2,11 @@ package com.lazyoft.legami.tests;
 
 import com.lazyoft.legami.accessors.IAccessor;
 import com.lazyoft.legami.accessors.IValueConverter;
+import com.lazyoft.legami.binding.BindingDescriptors;
 import com.lazyoft.legami.binding.IProperty;
 import com.lazyoft.legami.binding.IResourceProvider;
 import com.lazyoft.legami.binding.IValueConverterProvider;
 import com.lazyoft.legami.binding.TokenVisitor;
-import com.lazyoft.legami.binding.VisitResultList;
 import com.lazyoft.legami.parsing.BindingParser;
 import com.lazyoft.legami.parsing.IBindingParser;
 import com.lazyoft.legami.parsing.Token;
@@ -60,73 +60,85 @@ public class TokenVisitorSpecifications {
 
         @Test
         public void should_return_the_binding_expression_corresponding_to_the_tokens() {
-            VisitResultList result = whenVisiting("source := target");
-            assertThat(result.getCurrentResult().converted).isFalse();
+            BindingDescriptors result = whenVisiting("source := target");
+            assertThat(result.getLast().converted).isFalse();
+            assertThat(result.getLast().targetParts).containsExactly("target");
+            assertThat(result.getLast().sourceParts).containsExactly("source");
 
-            verifyProperty(result.getCurrentResult().source, "source");
-            verifyProperty(result.getCurrentResult().target, "target");
+            verifyProperty(result.getLast().source, "source");
+            verifyProperty(result.getLast().target, "target");
         }
 
         @Test
         public void should_return_the_binding_expression_composing_a_path_if_present() {
-            VisitResultList result = whenVisiting("source := target.sub1.sub2.sub3");
-            assertThat(result.getCurrentResult().converted).isFalse();
+            BindingDescriptors result = whenVisiting("source := target.sub1.sub2.sub3");
+            assertThat(result.getLast().converted).isFalse();
+            assertThat(result.getLast().targetParts).containsExactly("target", "sub1", "sub2", "sub3");
+            assertThat(result.getLast().sourceParts).containsExactly("source");
 
-            verifyProperty(result.getCurrentResult().source, "source");
-            verifyProperty(result.getCurrentResult().target, "target", "sub1", "sub2", "sub3");
+            verifyProperty(result.getLast().source, "source");
+            verifyProperty(result.getLast().target, "target", "sub1", "sub2", "sub3");
         }
 
         @Test
         public void should_return_the_binding_expression_composing_a_conversion_if_present() {
-            VisitResultList result = whenVisiting("source := convert(target.sub1)");
-            assertThat(result.getCurrentResult().converted).isTrue();
-            assertThat(result.getCurrentResult().parameter).isNull();
+            BindingDescriptors result = whenVisiting("source := convert(target.sub1)");
+            assertThat(result.getLast().converted).isTrue();
+            assertThat(result.getLast().parameter).isNull();
+            assertThat(result.getLast().targetParts).containsExactly("target", "sub1");
+            assertThat(result.getLast().sourceParts).containsExactly("source");
 
-            verifyProperty(result.getCurrentResult().source, "source");
-            verifyProperty(result.getCurrentResult().target, "target", "sub1");
+            verifyProperty(result.getLast().source, "source");
+            verifyProperty(result.getLast().target, "target", "sub1");
             verifyConverterCall("convert", null);
         }
 
         @Test
         public void should_return_the_binding_expression_composing_a_conversion_with_a_string_parameter_if_present() {
-            VisitResultList result = whenVisiting("source := convert(target.sub1, /string literal/)");
-            assertThat(result.getCurrentResult().converted).isTrue();
-            assertThat(result.getCurrentResult().parameter).isEqualTo("string literal");
+            BindingDescriptors result = whenVisiting("source := convert(target.sub1, /string literal/)");
+            assertThat(result.getLast().converted).isTrue();
+            assertThat(result.getLast().parameter).isEqualTo("string literal");
+            assertThat(result.getLast().targetParts).containsExactly("target", "sub1");
+            assertThat(result.getLast().sourceParts).containsExactly("source");
 
-            verifyProperty(result.getCurrentResult().source, "source");
-            verifyProperty(result.getCurrentResult().target, "target", "sub1");
+            verifyProperty(result.getLast().source, "source");
+            verifyProperty(result.getLast().target, "target", "sub1");
             verifyConverterCall("convert", "string literal");
         }
 
         @Test
         public void should_return_the_binding_expression_composing_a_conversion_with_a_resource_if_present() {
-            VisitResultList result = whenVisiting("source := convert(target.sub1, #resource)");
-            assertThat(result.getCurrentResult().converted).isTrue();
-            assertThat(result.getCurrentResult().parameter).isSameAs(resource);
+            BindingDescriptors result = whenVisiting("source := convert(target.sub1, #resource)");
+            assertThat(result.getLast().converted).isTrue();
+            assertThat(result.getLast().parameter).isSameAs(resource);
+            assertThat(result.getLast().targetParts).containsExactly("target", "sub1");
+            assertThat(result.getLast().sourceParts).containsExactly("source");
 
-            verifyProperty(result.getCurrentResult().source, "source");
-            verifyProperty(result.getCurrentResult().target, "target", "sub1");
+            verifyProperty(result.getLast().source, "source");
+            verifyProperty(result.getLast().target, "target", "sub1");
             verifyConverterCall("convert", resource);
             verify(resourceProvider, times(1)).get("resource");
         }
 
         @Test
         public void should_return_the_binding_expression_composing_an_assignment_to_a_resource_if_specified() {
-            VisitResultList result = whenVisiting("source := #resource");
-            assertThat(result.getCurrentResult().converted).isFalse();
+            BindingDescriptors result = whenVisiting("source := #resource");
+            assertThat(result.getLast().converted).isFalse();
+            assertThat(result.getLast().targetParts).isEmpty();
+            assertThat(result.getLast().sourceParts).containsExactly("source");
 
-            verifyProperty(result.getCurrentResult().source, "source");
+            verifyProperty(result.getLast().source, "source");
             verify(resourceProvider, times(1)).get("resource");
-            assertThat(result.getCurrentResult().target.get(sourceObject)).isSameAs(resource);
+            assertThat(result.getLast().target.get(sourceObject)).isSameAs(resource);
         }
 
         @Test
         public void should_return_a_binding_expression_for_every_binding_expression_present() {
-            VisitResultList result = whenVisiting("{source := target} {otherSource := otherTarget} {last := lastTarget}");
-            assertThat(result.getResults().size()).isEqualTo(3);
+            BindingDescriptors result = whenVisiting("{source := target} {otherSource := otherTarget} {last := lastTarget}");
+            assertThat(result.size()).isEqualTo(3);
         }
 
-        private VisitResultList whenVisiting(String expression) {
+        private BindingDescriptors whenVisiting(String expression) {
             Token root = parser.parse(expression).getRoot();
             return visitor.visit(root, null);
         }

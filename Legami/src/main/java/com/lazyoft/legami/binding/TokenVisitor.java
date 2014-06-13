@@ -16,7 +16,9 @@ import com.lazyoft.legami.parsing.PathToken;
 import com.lazyoft.legami.parsing.StringLiteralToken;
 import com.lazyoft.legami.parsing.Token;
 
-public class TokenVisitor implements ITokenVisitor<VisitResultList> {
+import java.util.List;
+
+public class TokenVisitor implements ITokenVisitor<BindingDescriptors> {
     private IAccessor accessorChain;
     private final IValueConverterProvider valueConverterProvider;
     private final IResourceProvider resourceProvider;
@@ -27,15 +29,15 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
         this.resourceProvider = resourceProvider;
     }
 
-    public VisitResultList visit(Token token, VisitResultList param) {
+    public BindingDescriptors visit(Token token, BindingDescriptors param) {
         if(token == Token.NotFound)
             return param;
         return token.acceptVisitor(this, null);
     }
 
     @Override
-    public VisitResultList visit(IdentifierToken token, VisitResultList param) {
-        VisitResult result = param.getCurrentResult();
+    public BindingDescriptors visit(IdentifierToken token, BindingDescriptors param) {
+        BindingDescriptor result = param.getLast();
         final String path = token.getName();
         result.target = new IProperty() {
             @Override
@@ -52,9 +54,10 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
     }
 
     @Override
-    public VisitResultList visit(final PathToken token, VisitResultList param) {
-        VisitResult result = param.getCurrentResult();
+    public BindingDescriptors visit(final PathToken token, BindingDescriptors param) {
+        BindingDescriptor result = param.getLast();
         if(token.getIdentifiers().size() == 1) {
+            result.targetParts = new String[] { ((IdentifierToken)token.getIdentifiers().get(0)).getName() };
             return token.getIdentifiers().get(0).acceptVisitor(this, param);
         }
 
@@ -88,12 +91,13 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
                     accessorChain.set(identifiers[identifiers.length - 1], result, value);
             }
         };
+        result.targetParts = identifiers;
         return param;
     }
 
     @Override
-    public VisitResultList visit(ConstantLiteralToken token, VisitResultList param) {
-        VisitResult result = param.getCurrentResult();
+    public BindingDescriptors visit(ConstantLiteralToken token, BindingDescriptors param) {
+        BindingDescriptor result = param.getLast();
         final Object constant = resourceProvider.get(token.getName());
         if(result.converted)
             result.parameter = constant;
@@ -113,8 +117,8 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
     }
 
     @Override
-    public VisitResultList visit(StringLiteralToken token, VisitResultList param) {
-        VisitResult result = param.getCurrentResult();
+    public BindingDescriptors visit(StringLiteralToken token, BindingDescriptors param) {
+        BindingDescriptor result = param.getLast();
         final String literal = token.getText();
         if(result.converted)
             result.parameter = literal;
@@ -134,8 +138,8 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
     }
 
     @Override
-    public VisitResultList visit(ConversionToken token, VisitResultList param) {
-        final VisitResult result = param.getCurrentResult();
+    public BindingDescriptors visit(ConversionToken token, BindingDescriptors param) {
+        final BindingDescriptor result = param.getLast();
 
         result.converted = true;
         param = token.getParameter().acceptVisitor(this, param);
@@ -162,8 +166,8 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
     }
 
     @Override
-    public VisitResultList visit(final BindingExpressionToken token, VisitResultList param) {
-        VisitResult result = new VisitResult();
+    public BindingDescriptors visit(final BindingExpressionToken token, BindingDescriptors param) {
+        BindingDescriptor result = new BindingDescriptor();
         param.add(result);
         result.source = new IProperty() {
             @Override
@@ -176,16 +180,17 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
                 accessorChain.set(token.getSourceName(), source, value);
             }
         };
+        result.sourceParts = new String[] { token.getSourceName() };
         return token.getExpression().acceptVisitor(this, param);
     }
 
     @Override
-    public VisitResultList visit(BindingListItemToken token, VisitResultList param) {
+    public BindingDescriptors visit(BindingListItemToken token, BindingDescriptors param) {
         return token.getTokens().get(0).acceptVisitor(this, param);
     }
 
     @Override
-    public VisitResultList visit(BindingListToken token, VisitResultList param) {
+    public BindingDescriptors visit(BindingListToken token, BindingDescriptors param) {
         for(Token currentToken: token.getTokens()) {
             currentToken.acceptVisitor(this, param);
         }
@@ -193,12 +198,12 @@ public class TokenVisitor implements ITokenVisitor<VisitResultList> {
     }
 
     @Override
-    public VisitResultList visit(BindingToken token, VisitResultList param) {
-        return token.getTokens().get(0).acceptVisitor(this, new VisitResultList());
+    public BindingDescriptors visit(BindingToken token, BindingDescriptors param) {
+        return token.getTokens().get(0).acceptVisitor(this, new BindingDescriptors());
     }
 
     @Override
-    public VisitResultList visit(ExpressionToken token, VisitResultList param) {
+    public BindingDescriptors visit(ExpressionToken token, BindingDescriptors param) {
         return token.getTokens().get(0).acceptVisitor(this, param);
     }
 }
