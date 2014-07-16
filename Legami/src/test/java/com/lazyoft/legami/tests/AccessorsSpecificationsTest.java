@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(org.junit.experimental.runners.Enclosed.class)
-public class AccessorsSpecifications {
+public class AccessorsSpecificationsTest {
     public static class when_requesting_a_field {
         FieldAccessor accessor;
         IReflectionHelper helper;

@@ -1,5 +1,4 @@
-apply plugin: 'android-library'
-apply plugin: 'android-test'
+apply plugin: 'android'
 
 android {
     packagingOptions {
@@ -16,7 +15,6 @@ android {
         targetSdkVersion 19
         versionCode 1
         versionName '1.0'
-        testInstrumentationRunner "com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner"
     }
     buildTypes {
         release {
@@ -25,41 +23,18 @@ android {
         }
     }
 
-    sourceSets {
-        androidTest {
-            setRoot('src/test')
-        }
-    }
-
 }
 
-androidTest {
-    include '**/*Specifications.class'
-    exclude '**/espresso/**/*.class'
-}
+apply plugin: 'android-unit-test'
 
 dependencies {
-    repositories {
-        mavenCentral()
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots/'
-        }
-    }
-    compile 'com.netflix.rxjava:rxjava-android:+'
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile files('lib/espresso-1.1.jar', 'lib/testrunner-1.1.jar', 'lib/testrunner-runtime-1.1.jar')
-    androidTestCompile 'com.google.guava:guava:14.0.1',
-            'com.squareup.dagger:dagger:1.1.0',
-            'org.hamcrest:hamcrest-integration:1.1',
-            'org.hamcrest:hamcrest-core:1.1',
-            'org.hamcrest:hamcrest-library:1.1',
-            'org.mockito:mockito-core:1.9.5',
-            'org.assertj:assertj-core:1.5.0'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'org.assertj:assertj-core:1.5.0'
 
-    androidTestCompile('junit:junit:4.11') {
+    testCompile('junit:junit:4.11') {
         exclude module: 'hamcrest-core'
     }
-    androidTestCompile('org.robolectric:robolectric:2.3') {
+    testCompile('org.robolectric:robolectric:2.3') {
         exclude module: 'classworlds'
         exclude module: 'maven-artifact'
         exclude module: 'maven-artifact-manager'
@@ -78,17 +53,5 @@ dependencies {
         exclude module: 'wagon-http-shared'
         exclude module: 'wagon-provider-api'
     }
-    androidTestCompile 'com.squareup:fest-android:1.0.+'
 }
 
-dependencies {
-    // Espresso
-}
-
-apply plugin: 'idea'
-
-idea {
-    module {
-        testOutputDir = file('build/test-classes/debug')
-    }
-}

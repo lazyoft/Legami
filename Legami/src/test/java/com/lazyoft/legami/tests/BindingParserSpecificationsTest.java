@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @RunWith(org.junit.experimental.runners.Enclosed.class)
-public class BindingParserSpecifications {
+public class BindingParserSpecificationsTest {
     static BindingParser bindingParser;
 
     @BeforeClass

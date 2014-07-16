@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(org.junit.experimental.runners.Enclosed.class)
-public class ReflectionHelperSpecifications {
+public class ReflectionHelperSpecificationsTest {
     static ReflectionHelper helper;
 
     @BeforeClass
